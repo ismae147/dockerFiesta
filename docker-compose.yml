@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  api:
+    build: .
+    image: strapi/strapi
+    environment:
+      - APP_NAME=fiesta_today_api
+      - DATABASE_CLIENT=mysql
+      - DATABASE_HOST=192.168.1.11
+      - DATABASE_PORT=33060
+      - DATABASE_NAME=fiesta_today
+      - DATABASE_USERNAME=root
+      - DATABASE_PASSWORD=password
+      - DATABASE_SSL=false
+      - DATABASE_AUTHENTICATION_DATABASE=mysql
+      - HOST=localhost
+    ports:
+      - 1337:1337
+    volumes:
+      - ./fiesta_today_api:/usr/src/api/fiesta_today_api
+    depends_on:
+      - db
+      - phpmyadmin
+    restart: always
+  # Database
+  db:
+    image: mysql:5.7
+    volumes:
+      - ./db_data:/var/lib/mysql
+    restart: always
+    ports:
+      - 33060:3306
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: fiesta_today
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: password
+  # phpmyadmin
+  phpmyadmin:
+    depends_on:
+      - db
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    ports:
+      - 8080:80
+    environment:
+      PMA_HOST: db
+      MYSQL_ROOT_PASSWORD: password
